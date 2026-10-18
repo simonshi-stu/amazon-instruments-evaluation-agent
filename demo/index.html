@@ -1,8 +1,131 @@
 <!doctype html>
 <html lang="zh-CN">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>评论评测实验室 · Agent Demo</title><link rel="stylesheet" href="style.css"></head>
-<body><header><span class="tag">Amazon 乐器评论 · 评测与诊断</span><h1>让每一个结论，都有证据。</h1><p>看懂一次评测：检查任务 → 比较误差 → 看失败覆盖 → 核对结论。</p><p class="notice">合成演示 · 无在线 LLM · 不代表真实 Amazon、Memory 或用户泛化成绩</p></header>
-<main><section class="panel"><h2>01 / 选择一个实验故事</h2><label for="scenario">演示场景</label><select id="scenario"><option value="balanced">相同任务上的两种示例方案</option><option value="survivor">低误差可能掩盖大量失败</option><option value="insufficient">没有共同成功任务时怎么办</option></select><button id="run" disabled>查看评测流程</button><p>指标由公开 Python 工具在构建时计算，网页选择并校验预计算报告；不是点击后调用远端 Python 或 LLM。</p><p id="status" role="status" aria-live="polite">正在读取示例报告…</p></section>
-<section class="panel"><h2>02 / 这条链路在做什么</h2><ol id="flow"><li>合成输入与版本</li><li>同任务、同标签对齐</li><li>实际工具计算</li><li>误差与覆盖可视化</li><li>证据约束的解释</li></ol><p>这是工具增强的固定工作流，不是自主多 Agent。流程状态来自报告校验与页面渲染，不播放假运行进度。</p></section>
-<section id="result" hidden aria-live="polite"><h2 id="title"></h2><div id="cards" class="grid"></div><div class="grid"><section class="panel"><h3>共同成功任务上的 MAE</h3><p>越低越好；只比较同一批任务，不混用两个分母。</p><div id="error-chart"></div></section><section class="panel"><h3>全部请求的四种结果</h3><p>回退不算模型成功，失败也不会算成零误差。</p><div id="status-chart"></div></section></div><section class="panel"><h3>完整指标与口径</h3><div class="table-wrap"><table><thead><tr><th>方案 / 口径</th><th>有效 / 请求</th><th>MAE</th><th>RMSE</th><th>±1 星</th><th>偏差</th></tr></thead><tbody id="metrics"></tbody></table></div></section><section class="panel"><h3>03 / 结论从哪里来？</h3><div id="claims"></div><h3>证据清单</h3><div id="evidence"></div></section><section class="panel"><h3>不能从这个 Demo 得出的结论</h3><ul id="limits"></ul><details><summary>查看版本与指纹</summary><pre id="provenance"></pre></details><button id="download">下载合成演示报告（非人工批准报告）</button></section></section>
-<section class="panel"><h2>工程设计与下一步</h2><p>A 模拟用户评分与评论；B 独立评测。Python 工具负责计算，未来模型只解释脱敏证据，再由规则与人工核对。AgentSociety、检索和 Memory 属于生成侧；B 不为演示强行接入 LangChain 或向量库。</p><a href="https://github.com/simonshi-stu/amazon-instruments-evaluation-agent">源码与运行方法</a></section></main><footer>只发布合成演示与源码。无密钥、无原始评论、无数据上传、无付费调用。</footer><script type="module" src="app.js"></script></body></html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>评论评测实验室 · Agent Demo</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <span class="tag">Amazon 乐器评论 · 评测与诊断</span>
+    <h1>一次评测，四个问题。</h1>
+    <p class="lede">这个页面用 12 个合成任务，演示评测在问什么、图怎么看、结论是什么、还缺什么。</p>
+    <p class="small">本页四段：概要 → Visualization / 可视化 → 分析 → 总结。</p>
+    <p class="notice">合成演示 · 没有调用 LLM · 不代表真实 Amazon、Memory 或用户泛化成绩</p>
+  </header>
+
+  <main>
+    <section class="panel">
+      <h2>先选一个场景</h2>
+      <p class="lede">三个场景都在讲同一件事：数字看起来漂亮，不代表结论可信。所有数据都是手写的合成样例，不是模型排行榜。</p>
+      <label for="scenario">演示场景</label>
+      <select id="scenario">
+        <option value="balanced">公平比较：同一批任务上的 A / B</option>
+        <option value="survivor">低误差的假象：大量失败被排除</option>
+        <option value="insufficient">无法比较：没有共同成功任务</option>
+      </select>
+      <button id="run" disabled>查看评测结果</button>
+      <p class="small">指标由公开 Python 工具在构建时计算；网页只读取并校验预计算报告，不会在浏览器或服务器实时调用模型。</p>
+      <p id="status" role="status" aria-live="polite">正在读取示例报告…</p>
+    </section>
+
+    <section class="panel">
+      <h2>评测流程</h2>
+      <ol id="flow">
+        <li>合成输入与版本</li>
+        <li>同任务、同标签对齐</li>
+        <li>Python 计算指标</li>
+        <li>误差与覆盖可视化</li>
+        <li>证据约束的结论</li>
+      </ol>
+      <p class="small">这是工具增强的固定工作流，不是自主多 Agent。流程状态来自报告校验与页面渲染，不播放假进度。</p>
+    </section>
+
+    <section id="result" hidden aria-live="polite">
+      <section class="panel">
+        <p class="eyebrow">01 / 概要</p>
+        <h2 id="title"></h2>
+        <p id="overview-objective" class="lede"></p>
+        <div id="cards" class="grid"></div>
+        <p id="overview-data" class="small"></p>
+        <p id="overview-reading" class="small"></p>
+      </section>
+
+      <section class="panel">
+        <p class="eyebrow">02 / Visualization · 可视化</p>
+        <h2>先看图，再读表</h2>
+        <p>左图比较共同成功任务上的平均误差，越低越好；右图展示全部请求的四种结果。两边的分母不同，不能混着看。</p>
+        <div class="grid">
+          <section class="panel inset">
+            <h3>共同成功任务上的 MAE</h3>
+            <p class="small">只比较 A、B 都成功的同一批任务；没有共同任务时不做图。</p>
+            <div id="error-chart"></div>
+          </section>
+          <section class="panel inset">
+            <h3>全部请求的四种结果</h3>
+            <p class="small">成功、回退、失败、拒绝分别计数。回退不算模型成功，失败也不会算成零误差。</p>
+            <div id="status-chart"></div>
+          </section>
+        </div>
+        <h3>完整指标与口径</h3>
+        <p class="small">“仅模型成功”只算真正成功的预测；“系统含回退”把统计回退也算进可用结果。两种分母都要报告。</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>方案 / 口径</th><th>有效 / 请求</th><th>MAE</th><th>RMSE</th><th>±1 星</th><th>偏差</th></tr></thead>
+            <tbody id="metrics"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel">
+        <p class="eyebrow">03 / 分析</p>
+        <h2>这些数字说明了什么？</h2>
+        <div id="analysis" class="analysis-list"></div>
+        <h3>结论引用与证据</h3>
+        <p class="small">每条结论都要能回到具体证据；下面不是营销文案，也不能脱离分母单独引用。</p>
+        <div id="claims"></div>
+        <h3>证据清单</h3>
+        <div id="evidence"></div>
+      </section>
+
+      <section class="panel">
+        <p class="eyebrow">04 / 总结</p>
+        <h2>能下什么结论，还缺什么？</h2>
+        <div class="summary-grid">
+          <div class="summary-box">
+            <h3>当前方案的准确性</h3>
+            <p id="accuracy-status" class="summary-status"></p>
+            <p id="accuracy-detail"></p>
+            <p id="accuracy-checked" class="small"></p>
+          </div>
+          <div class="summary-box">
+            <h3>这次能下的结论</h3>
+            <p id="summary-conclusion"></p>
+          </div>
+        </div>
+        <h3>后续改进</h3>
+        <ol id="improvements" class="improvement-list"></ol>
+        <h3>不能从这个 Demo 得出的结论</h3>
+        <ul id="limits"></ul>
+        <details>
+          <summary>查看版本与指纹</summary>
+          <pre id="provenance"></pre>
+        </details>
+        <button id="download">下载合成演示报告（非人工批准报告）</button>
+      </section>
+    </section>
+
+    <section class="panel">
+      <h2>这个 Demo 在项目里的位置</h2>
+      <p>A 负责生成用户评分和评论，B 负责独立评测。这里展示的是 B 的评测逻辑，不是 A 的真实模型成绩。Python 工具负责计算，未来模型只解释脱敏证据，再由规则和人工核对。</p>
+      <p class="small">AgentSociety、检索和 Memory 属于生成侧；B 不会为了演示强行接入 LangChain 或向量库。</p>
+      <a href="https://github.com/simonshi-stu/amazon-instruments-evaluation-agent">源码与运行方法</a>
+    </section>
+  </main>
+
+  <footer>只发布合成演示与源码。无密钥、无原始评论、无数据上传、无付费调用。</footer>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
