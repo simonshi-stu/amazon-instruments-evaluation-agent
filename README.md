@@ -4,7 +4,7 @@
 
 与 [LLM 用户模拟 Agent（项目 A）](https://github.com/simonshi-stu/llm-user-simulation-agent)职责不同：A 生成评分和评论，B 评测预测、发现问题并解释证据。不是把同一个生成 Agent 改名，也不需要再增加一个 Amazon Agent。
 
-## 它评测什么，不评测什么
+## 目标评测范围（阶段①尚不评分）
 
 | 能回答的问题 | 不能据此作出的判断 |
 | --- | --- |
@@ -16,12 +16,39 @@
 
 ## 当前状态（2026-10-14）
 
+### 在线演示版（2026-10-18）
+
+- [打开交互 Demo](https://simonshi-stu.github.io/amazon-instruments-evaluation-agent/)（上线状态以 GitHub Actions `Synthetic evaluation demo` 实际结果为准）。
+- GitHub Pages 只发布 `demo/` 的白名单静态文件和 Python 构建的合成报告；不发布原始评论、真实标签、密钥或私有实验。
+- 三个场景：共同任务比较、幸存者偏差、无共同任务。MAE/RMSE/±1 星/偏差由 Python 实际计算；成功、回退、失败、拒绝分别展示。
+- 网页选择的是预计算报告，并不在浏览器或服务器实时运行 LLM。解释为确定性模板，不是已完成的 LLM 解释器或人工批准导出。
+- 本轮本地测试：99 passed、3 skipped。三项跳过均因 A 新版契约镜像原件缺失；历史 99/391 项记录不能替代本轮结果。A 公开 main 源码已恢复到 E 盘，但不能把公开旧版当作遗失的新版本。
+- [精简中文面试问答与决策记录](docs/INTERVIEW_NOTES.zh-CN.md)：持续记录方法选择、Prompt 变更、幻觉与评测证据；未实测明确标注未知。
+
+本地重现（Python 3.10+）：`python -m pip install pytest==8.3.5`、`python -m pytest -q -rs`、`python -m amazon_eval_agent.demo --output _site`、`python -m http.server 8193 --bind 127.0.0.1 --directory _site`。浏览器打开 `http://127.0.0.1:8193/`，Ctrl+C 停止。实际开发的依赖、缓存、虚拟环境和临时目录放在 E 盘。
+
 - **可复用基础**：A 本地已核验 Amazon 2014 Musical Instruments 的 10,261 条评论、400 个目标任务和四种统计基线；不复制或重新公开数据。
-- **正在开发**：严格版本化模拟结果契约、A 导出入口、B 独立结果验证入口。未完成主会话独立验收，不预写命令或测试成绩。
+- **本地已实现并独立验收**：严格版本化模拟结果契约、A 离线 fake 导出入口、B 独立结果验证入口；A 391 项、B 99 项测试通过。阶段①应用代码尚未提交或发布。
 - **待完成**：完整评测工具注册/编排、共同任务方案比较、报告解释、指标与结论校验、人工确认导出和独立诊断 Demo。
 - **未实测**：新版真实 LLM 成绩、人工风格评审、Memory 效果、在线成本与延迟。
 
-当前不能把“已有评测脚本/生成 Demo”称为完整评测诊断 Agent。README 描述本地开发状态；远端发布状态与本地代码验收分开记录。
+当前不能把“已有评测脚本/合成可视化 Demo”称为完整评测诊断 Agent。上方演示版是新增进度；下方阶段①说明及历史状态保留作范围记录。完整真实评测、模型解释与批准导出仍未完成。
+
+## 阶段①独立运行（仅本地未发布代码）
+
+在本地 B 仓库根目录使用 Python 标准库即可，不依赖 A 应用安装、真实数据或 API key：
+
+```powershell
+python -m amazon_eval_agent validate --dry-run
+python -m amazon_eval_agent validate --check --json
+python -m amazon_eval_agent validate --input "<模拟结果文件的绝对路径>" --json
+```
+
+`--check` 使用手写合成四态样例，包含 failed/refused/degraded，不是全成功运行。退出码 0 表示**结果文件契约合法**，不表示其中预测全成功；错误输入返回 2。输出只展示安全计数、枚举与指纹，不回显正文、路径或原始错误。`--output` 可将安全诊断另存新文件，拒绝覆盖；这不是未来的人工批准评测报告导出。
+
+B 不独立重算任务清单或指纹，不验证真实模型调用，不检查句子是否被引用支持。`real_measurement_status=not_verified_or_not_run`、`accuracy_claim=none`；目标标签不进入结果契约。字段白名单不等于正文脱敏，用户组仅为配对伪名。
+
+canonical 契约位于 `amazon_eval_agent/contracts/simulation_run_v1.py`，A 镜像注明来源；测试比较共享 AST、schema hash 与 19 个敌意输入行为。生产代码不动态导入 A。
 
 ## 目标工作流
 
@@ -59,7 +86,7 @@
 ## 开发与面试讲解
 
 - [逐步开发计划、指标、幻觉与人工评审](docs/DEVELOPMENT_PLAN.md)
-- 复现命令与测试成绩将在对应阶段独立验收后加入。
+- 阶段①只覆盖上述校验入口；完整工具编排、比较、解释和人工确认导出仍按计划逐步验收。
 - 本项目与 A 的真实成绩不得从历史课程汇总、统计基线或 fake 演示互相替代。
 
 不自动提交、推送、部署或发布生成评论。真实模型、人评、数据外发和付费服务均需先确认范围、调用量与预算。
