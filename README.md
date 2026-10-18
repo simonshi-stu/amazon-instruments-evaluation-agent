@@ -72,9 +72,9 @@ B 把数值、分母、覆盖率、限制整理成证据包
 **已经能用**
 
 - 严格的 `simulation_run.v1` 结果校验器和独立命令行入口。检查结构、资源上限、状态一致性、诊断不变量和敏感字段，同时不回显评论正文或文件路径。
-- GitHub Pages 在线合成 Demo：[打开演示](https://simonshi-stu.github.io/amazon-instruments-evaluation-agent/)。
+- GitHub Pages 在线合成 Demo：[打开演示](https://simonshi-stu.github.io/amazon-instruments-evaluation-agent/)。页面按“概要 → Visualization / 可视化 → 分析 → 总结”组织，总结会明确写真实模型准确率未测量以及后续改进。
 - 确定性的 Python 示例评分：MAE、RMSE、±1 星、偏差、覆盖率、共同任务比较；没有共同任务时拒绝比较。
-- 本轮验证：**99 项测试通过，3 项跳过**。跳过的是需要项目 A 新版契约镜像的跨仓检查，原件目前缺失。A 的公开 `main` 源码已恢复，但不能拿公开旧版冒充遗失的新版。
+- 本轮验证：**100 项测试通过，3 项跳过**。跳过的是需要项目 A 新版契约镜像的跨仓检查，原件目前缺失。A 的公开 `main` 源码已恢复，但不能拿公开旧版冒充遗失的新版。
 
 **还没有完成**
 
@@ -215,9 +215,9 @@ The online demo tells this story with three small synthetic scenarios:
 **Working today**
 
 - A strict `simulation_run.v1` artifact validator with a standalone CLI. It checks shape, resource limits, status consistency, diagnostic invariants, and privacy-sensitive fields without echoing review text or paths.
-- A public synthetic demo on GitHub Pages: [open the demo](https://simonshi-stu.github.io/amazon-instruments-evaluation-agent/).
+- A public synthetic demo on GitHub Pages: [open the demo](https://simonshi-stu.github.io/amazon-instruments-evaluation-agent/). It is organised as Overview → Visualization → Analysis → Summary; the summary states that real-model accuracy is not measured and lists concrete next improvements.
 - Deterministic Python demo scoring for MAE, RMSE, ±1-star accuracy, bias, coverage, and common-task comparison. The demo also refuses to compare when there are no common tasks.
-- Verified in this round: **99 tests passed, 3 skipped**. The skipped cross-repository checks require the original newer Project A contract mirror, which is not present. The public Project A `main` source has been restored, but it is not a substitute for that missing mirror.
+- Verified in this round: **100 tests passed, 3 skipped**. The skipped cross-repository checks require the original newer Project A contract mirror, which is not present. The public Project A `main` source has been restored, but it is not a substitute for that missing mirror.
 
 **Not finished yet**
 
