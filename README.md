@@ -74,7 +74,6 @@ B 把数值、分母、覆盖率、限制整理成证据包
 - 严格的 `simulation_run.v1` 结果校验器和独立命令行入口。检查结构、资源上限、状态一致性、诊断不变量和敏感字段，同时不回显评论正文或文件路径。
 - GitHub Pages 在线合成 Demo：[打开演示](https://simonshi-stu.github.io/amazon-instruments-evaluation-agent/)。
 - 确定性的 Python 示例评分：MAE、RMSE、±1 星、偏差、覆盖率、共同任务比较；没有共同任务时拒绝比较。
-- 一份精简的中文面试／决策记录，覆盖方法选择、Prompt 变化、幻觉检查、评测设计、Memory 和泛化：[docs/INTERVIEW_NOTES.zh-CN.md](docs/INTERVIEW_NOTES.zh-CN.md)。
 - 本轮验证：**99 项测试通过，3 项跳过**。跳过的是需要项目 A 新版契约镜像的跨仓检查，原件目前缺失。A 的公开 `main` 源码已恢复，但不能拿公开旧版冒充遗失的新版。
 
 **还没有完成**
@@ -135,7 +134,6 @@ python -m http.server 8193 --bind 127.0.0.1 --directory _site
 
 - [开发计划与评测边界](docs/DEVELOPMENT_PLAN.md)
 - [数据集与许可核对](docs/DATASETS.md)
-- [中文面试与决策记录](docs/INTERVIEW_NOTES.zh-CN.md)
 - [包内契约细节](amazon_eval_agent/README.md)
 - [项目 A：生成侧](https://github.com/simonshi-stu/llm-user-simulation-agent)
 
@@ -219,7 +217,6 @@ The online demo tells this story with three small synthetic scenarios:
 - A strict `simulation_run.v1` artifact validator with a standalone CLI. It checks shape, resource limits, status consistency, diagnostic invariants, and privacy-sensitive fields without echoing review text or paths.
 - A public synthetic demo on GitHub Pages: [open the demo](https://simonshi-stu.github.io/amazon-instruments-evaluation-agent/).
 - Deterministic Python demo scoring for MAE, RMSE, ±1-star accuracy, bias, coverage, and common-task comparison. The demo also refuses to compare when there are no common tasks.
-- A concise Chinese interview/decision log covering method choices, prompt changes, hallucination checks, evaluation design, memory, and generalisation: [docs/INTERVIEW_NOTES.zh-CN.md](docs/INTERVIEW_NOTES.zh-CN.md).
 - Verified in this round: **99 tests passed, 3 skipped**. The skipped cross-repository checks require the original newer Project A contract mirror, which is not present. The public Project A `main` source has been restored, but it is not a substitute for that missing mirror.
 
 **Not finished yet**
@@ -280,7 +277,6 @@ Real reviews, target labels, private run artifacts, prompts, and experiment resu
 
 - [Development plan and evaluation boundaries](docs/DEVELOPMENT_PLAN.md)
 - [Dataset and licensing notes](docs/DATASETS.md)
-- [Chinese interview and decision notes](docs/INTERVIEW_NOTES.zh-CN.md)
 - [Package-level contract details](amazon_eval_agent/README.md)
 - [Project A: the generation side](https://github.com/simonshi-stu/llm-user-simulation-agent)
 
