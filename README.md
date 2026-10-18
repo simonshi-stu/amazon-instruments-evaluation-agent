@@ -33,7 +33,7 @@ This project exists to make evaluation independent from generation:
 
 The project is deliberately not built as a multi-agent spectacle. The first version is a **tool-augmented, fixed workflow**: Python calculates, an LLM may later explain, and a human approves. LangChain, LangGraph, and a vector database are not required for this stage. RAG and persistent memory matter more on the generation side, where they still need controlled comparison before anyone claims a benefit.
 
-## 2. How it is used
+## 2. Scenarios and workflow
 
 A typical evaluation story looks like this:
 
@@ -85,7 +85,7 @@ The online demo tells this story with three small synthetic scenarios:
 
 The short version: **the contract and a transparent synthetic demo are working; the full evaluation-and-diagnosis agent is not finished.**
 
-## 4. How to use it
+## 4. Running and deploying it
 
 There is **no plugin and no backend service**. The public demo is a static site; the local tools are a Python CLI and a standard-library Python package.
 
