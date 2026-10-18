@@ -1,0 +1,39 @@
+# Local environments, dependencies and caches.
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.pytest_tmp/
+.ruff_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+node_modules/
+_site/
+
+# Credentials are never versioned.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Private data and generated artifacts stay local.
+data/
+Dataset/
+results/
+reports/
+artifacts/
+*.json.gz
+*.jsonl.gz
+prompt_trace*
+per_task_*
+predictions_*
+groundtruth_*
+temporal_manifest*
+
+# Editor and OS files.
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
