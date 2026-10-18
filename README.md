@@ -1,92 +1,141 @@
-# Amazon 乐器评论评测与诊断 Agent
+# Amazon Musical Instruments Review Evaluation & Diagnostics Agent
 
-**项目 B：接收评测目标与确认配置，输出工具计算支持的诊断报告。**
+[English](README.md) | [简体中文](README.zh-CN.md)
 
-与 [LLM 用户模拟 Agent（项目 A）](https://github.com/simonshi-stu/llm-user-simulation-agent)职责不同：A 生成评分和评论，B 评测预测、发现问题并解释证据。不是把同一个生成 Agent 改名，也不需要再增加一个 Amazon Agent。
+This is the **evaluation side (Project B)** of a two-part user-simulation project. Project A generates predicted ratings and reviews for Amazon Musical Instruments users. This project checks whether those predictions are actually good, where they fail, and what the evidence can honestly support.
 
-## 目标评测范围（阶段①尚不评分）
+It is not a review generator, and it is not a second Amazon shopping agent.
 
-| 能回答的问题 | 不能据此作出的判断 |
-| --- | --- |
-| 预测评分与用户实际评分有多大误差 | 商品客观质量是否一定好/坏 |
-| 生成评论长度、复制参考和风格是否异常 | 用户是否真的购买、某段消费经历是否真实 |
-| 失败、修复、回退和预算占用是否合理 | fake 运行是否证明真实模型准确 |
-| Memory 是否真正进入 prompt，配对差异是否有足够证据 | 开了 Memory 就一定有收益 |
-| 数据/任务是否对齐，是否违反时间与标签隔离协议 | 一条合法引用就证明整段评论的事实正确 |
+## 0. Credits and acknowledgements
 
-## 当前状态（2026-10-14）
+This project is built on the shoulders of several separate efforts:
 
-### 在线演示版（2026-10-18）
+- **Project A — [LLM User Simulation Agent](https://github.com/simonshi-stu/llm-user-simulation-agent).** The generation side of the same research project. A produces simulated ratings and reviews; B evaluates them through a versioned result contract.
+- **[AgentSocietyChallenge](https://github.com/tsinghua-fib-lab/AgentSocietyChallenge)** (FIB Lab, Tsinghua University, MIT License). Project A uses its PyPI package as the simulation framework. This evaluation repository does **not** vendor or import that framework. The upstream authors have not reviewed or endorsed this project.
+- **Amazon Product Data (2014), Musical Instruments 5-core reviews**, maintained by Julian McAuley's group at UC San Diego. The dataset page is [here](https://cseweb.ucsd.edu/~jmcauley/datasets/amazon/links.html). We do not redistribute the raw reviews, targets, or private run files. Public availability does not by itself settle redistribution or commercial-use rights; please check the source and any applicable terms before using the data.
+- **GitHub Pages** hosts the static synthetic demo. No dataset or model service is exposed there.
 
-- [打开交互 Demo](https://simonshi-stu.github.io/amazon-instruments-evaluation-agent/)（上线状态以 GitHub Actions `Synthetic evaluation demo` 实际结果为准）。
-- GitHub Pages 只发布 `demo/` 的白名单静态文件和 Python 构建的合成报告；不发布原始评论、真实标签、密钥或私有实验。
-- 三个场景：共同任务比较、幸存者偏差、无共同任务。MAE/RMSE/±1 星/偏差由 Python 实际计算；成功、回退、失败、拒绝分别展示。
-- 网页选择的是预计算报告，并不在浏览器或服务器实时运行 LLM。解释为确定性模板，不是已完成的 LLM 解释器或人工批准导出。
-- 本轮本地测试：99 passed、3 skipped。三项跳过均因 A 新版契约镜像原件缺失；历史 99/391 项记录不能替代本轮结果。A 公开 main 源码已恢复到 E 盘，但不能把公开旧版当作遗失的新版本。
-- [精简中文面试问答与决策记录](docs/INTERVIEW_NOTES.zh-CN.md)：持续记录方法选择、Prompt 变更、幻觉与评测证据；未实测明确标注未知。
+The people and organisations above provided data, framework code, or hosting. They did not write this evaluation design and do not endorse its conclusions.
 
-本地重现（Python 3.10+）：`python -m pip install pytest==8.3.5`、`python -m pytest -q -rs`、`python -m amazon_eval_agent.demo --output _site`、`python -m http.server 8193 --bind 127.0.0.1 --directory _site`。浏览器打开 `http://127.0.0.1:8193/`，Ctrl+C 停止。实际开发的依赖、缓存、虚拟环境和临时目录放在 E 盘。
+## 1. What this project is for, and why it is needed
 
-- **可复用基础**：A 本地已核验 Amazon 2014 Musical Instruments 的 10,261 条评论、400 个目标任务和四种统计基线；不复制或重新公开数据。
-- **本地已实现并独立验收**：严格版本化模拟结果契约、A 离线 fake 导出入口、B 独立结果验证入口；A 391 项、B 99 项测试通过。阶段①应用代码尚未提交或发布。
-- **待完成**：完整评测工具注册/编排、共同任务方案比较、报告解释、指标与结论校验、人工确认导出和独立诊断 Demo。
-- **未实测**：新版真实 LLM 成绩、人工风格评审、Memory 效果、在线成本与延迟。
+A simulated user can produce a review that sounds completely convincing and still be wrong. It may predict 5 stars when the real user gave 2, copy text from the reference review, fail halfway through, or claim that "memory helped" when the memory never entered the prompt.
 
-当前不能把“已有评测脚本/合成可视化 Demo”称为完整评测诊断 Agent。上方演示版是新增进度；下方阶段①说明及历史状态保留作范围记录。完整真实评测、模型解释与批准导出仍未完成。
+Those are different failures, and a single accuracy number hides them.
 
-## 阶段①独立运行（仅本地未发布代码）
+This project exists to make evaluation independent from generation:
 
-在本地 B 仓库根目录使用 Python 标准库即可，不依赖 A 应用安装、真实数据或 API key：
+- **Measure what can be measured.** Rating error, ranking of misses, coverage, format failures, retries, fallbacks, prompt inclusion, and runtime cost.
+- **Compare fairly.** Two methods are compared on the same tasks and the same users, not on whichever subset each method happened to finish.
+- **Show the denominator.** A model that succeeds on 3 easy tasks out of 12 should not look better than one that succeeds on 9 harder tasks.
+- **Keep explanations tied to evidence.** The long-term workflow lets a model explain tool results, but not invent numbers, citations, or causal claims.
+- **Say "we cannot tell" when the evidence is thin.** Missing clusters, missing common tasks, or absent real runs should produce an honest limitation, not a confident chart.
 
-```powershell
-python -m amazon_eval_agent validate --dry-run
-python -m amazon_eval_agent validate --check --json
-python -m amazon_eval_agent validate --input "<模拟结果文件的绝对路径>" --json
-```
+The project is deliberately not built as a multi-agent spectacle. The first version is a **tool-augmented, fixed workflow**: Python calculates, an LLM may later explain, and a human approves. LangChain, LangGraph, and a vector database are not required for this stage. RAG and persistent memory matter more on the generation side, where they still need controlled comparison before anyone claims a benefit.
 
-`--check` 使用手写合成四态样例，包含 failed/refused/degraded，不是全成功运行。退出码 0 表示**结果文件契约合法**，不表示其中预测全成功；错误输入返回 2。输出只展示安全计数、枚举与指纹，不回显正文、路径或原始错误。`--output` 可将安全诊断另存新文件，拒绝覆盖；这不是未来的人工批准评测报告导出。
+## 2. How it is used
 
-B 不独立重算任务清单或指纹，不验证真实模型调用，不检查句子是否被引用支持。`real_measurement_status=not_verified_or_not_run`、`accuracy_claim=none`；目标标签不进入结果契约。字段白名单不等于正文脱敏，用户组仅为配对伪名。
-
-canonical 契约位于 `amazon_eval_agent/contracts/simulation_run_v1.py`，A 镜像注明来源；测试比较共享 AST、schema hash 与 19 个敌意输入行为。生产代码不动态导入 A。
-
-## 目标工作流
+A typical evaluation story looks like this:
 
 ```text
-用户确认评测目标与配置
-  → 数据/时间划分/结果契约检查工具
-  → 固定统计基线工具 + 已有模拟结果评分工具
-  → 共同任务比较与运行诊断工具
-  → 工具证据包（数值、分母、区间、限制）
-  → 模型只解释证据包，不自行计算或发明指标
-  → 指标引用与结论规则校验
-  → 人工确认报告版本
-  → 导出脱敏报告
+A produces a run artifact
+        ↓
+B validates the artifact and its declared source
+        ↓
+B scores predictions and separates success / degraded / failed / refused
+        ↓
+B compares methods only on common valid tasks
+        ↓
+B packages numbers, denominators, coverage, and limitations as evidence
+        ↓
+An explanation layer may describe the evidence, but cannot recompute or invent it
+        ↓
+A human reviews and approves the report
 ```
 
-如果阶段顺序由执行器固定，准确名称是**工具增强的单 Agent 工作流**，不是自主多 Agent。
+Concrete examples:
 
-## 评测设计
+- **"Did the new prompt help?"** Run the old and new prompt on the same evaluation tasks. Compare MAE/RMSE, ±1-star accuracy, bias, failure rate, and coverage. A lower error on a smaller successful subset is not automatically an improvement.
+- **"Did memory help?"** Check whether memory was actually included in the prompt, then compare paired runs with and without it. A mode label is not evidence of a memory effect.
+- **"Is the agent ready for new users?"** Keep a user-level holdout that was never used for prompt tuning. Report old-user future behaviour and new-user generalisation separately.
+- **"Why is the report saying this?"** Every claim should point to a specific metric, sample size, denominator, and limitation.
 
-- 评分：RMSE、MAE、±1 星准确率、平均有符号偏差；成功模型结果与统计回退分别报告。
-- 评论：长度偏差、参考字符 n-gram 重合率；人工风格和评分—评论一致性评价单列，不把代理指标当事实真实性。
-- 可靠性：首次格式通过率、修复请求/调用/成功、四态覆盖、调用次数与耗时。
-- Memory：同任务/同参数的有无记忆配对；报告实际 prompt 纳入及用户覆盖，按整用户重采样。
-- 比较只能使用对应比较的共同有效任务；同时报告全请求覆盖率及被排除原因，防止不同分母造成假提升。
-- 样本、用户 cluster 或召回不足时，输出“无法判断”，不编造区间、显著性或改善结论。
+The online demo tells this story with three small synthetic scenarios:
 
-## 数据与权限
+- a fair comparison on common tasks;
+- a "low error" method that looks good only because most failures disappeared from its denominator;
+- a case where there are no common successful tasks, so the honest answer is "cannot compare".
 
-[数据集选择与许可核对](docs/DATASETS.md)涵盖 Amazon、MovieLens、Goodreads、Yelp 和 UCI 交易数据。公开可下载不等于允许任意再分发、商业使用或向第三方传输。
+## 3. Current progress
 
-真实评论、目标标签、prompt、逐任务结果、实验报告和密钥只保留在获准本地目录。模型解释器原则上只接收脱敏工具汇总，不接收评论正文；任何真实调用仍需明确授权。
+**Working today**
 
-时间防泄漏、目标及副本排除、实际渲染证据校验、用户/run 隔离和预算限制不能因拆仓库而放宽。共享代码和契约需标注来源、版本与职责；生产 B 不依赖 A 应用入口。
+- A strict `simulation_run.v1` artifact validator with a standalone CLI. It checks shape, resource limits, status consistency, diagnostic invariants, and privacy-sensitive fields without echoing review text or paths.
+- A public synthetic demo on GitHub Pages: [open the demo](https://simonshi-stu.github.io/amazon-instruments-evaluation-agent/).
+- Deterministic Python demo scoring for MAE, RMSE, ±1-star accuracy, bias, coverage, and common-task comparison. The demo also refuses to compare when there are no common tasks.
+- A concise Chinese interview/decision log covering method choices, prompt changes, hallucination checks, evaluation design, memory, and generalisation: [docs/INTERVIEW_NOTES.zh-CN.md](docs/INTERVIEW_NOTES.zh-CN.md).
+- Verified in this round: **99 tests passed, 3 skipped**. The skipped cross-repository checks require the original newer Project A contract mirror, which is not present. The public Project A `main` source has been restored, but it is not a substitute for that missing mirror.
 
-## 开发与面试讲解
+**Not finished yet**
 
-- [逐步开发计划、指标、幻觉与人工评审](docs/DEVELOPMENT_PLAN.md)
-- 阶段①只覆盖上述校验入口；完整工具编排、比较、解释和人工确认导出仍按计划逐步验收。
-- 本项目与 A 的真实成绩不得从历史课程汇总、统计基线或 fake 演示互相替代。
+- The production metric pipeline has not been wired to real run artifacts. The current scoring and comparison live in the synthetic demo.
+- The explanation layer, claim-to-evidence validator, uncertainty intervals, and human-approved export are still later stages.
+- No real LLM experiment, human style review, memory effect measurement, or new-user holdout result has been produced in this round.
+- The demo's charts are evidence of the evaluation logic, not evidence of model quality. The page says this explicitly and makes no real-accuracy claim.
 
-不自动提交、推送、部署或发布生成评论。真实模型、人评、数据外发和付费服务均需先确认范围、调用量与预算。
+The short version: **the contract and a transparent synthetic demo are working; the full evaluation-and-diagnosis agent is not finished.**
+
+## 4. How to use it
+
+There is **no plugin and no backend service**. The public demo is a static site; the local tools are a Python CLI and a standard-library Python package.
+
+### Use the online demo
+
+Open: [https://simonshi-stu.github.io/amazon-instruments-evaluation-agent/](https://simonshi-stu.github.io/amazon-instruments-evaluation-agent/)
+
+Choose a scenario, inspect the metrics, follow each claim to its evidence, and download the synthetic report if useful. The page is in Chinese. It never uploads files and never calls a model.
+
+### Run the validator locally
+
+Requires Python 3.10 or newer. The validator itself uses only the standard library.
+
+```powershell
+python -m amazon_eval_agent validate --check
+python -m amazon_eval_agent validate --input "<path-to-run-artifact.json>" --json
+```
+
+Exit code `0` means the artifact is contract-valid. It does **not** mean the predictions are accurate. A valid artifact may still contain failed, refused, or degraded records, and the report shows those separately.
+
+### Run the tests and the demo locally
+
+```powershell
+python -m pip install pytest==8.3.5
+python -m pytest -q -rs
+
+python -m amazon_eval_agent.demo --output _site
+python -m http.server 8193 --bind 127.0.0.1 --directory _site
+```
+
+Then open `http://127.0.0.1:8193/` and stop the server with `Ctrl+C`. The demo builder copies only three whitelisted files plus the generated synthetic reports; it does not read the repository's private data directories.
+
+### Deploy your own copy
+
+The included workflow `.github/workflows/pages.yml` runs the tests, builds `_site`, and deploys it to GitHub Pages when `main` is updated. To use it in a fork:
+
+1. Push the repository to GitHub.
+2. Open **Settings → Pages** and choose **GitHub Actions** as the source.
+3. Push to `main`, or run the **Synthetic evaluation demo** workflow manually.
+
+No API key, database, or LLM endpoint is needed. That is intentional: the public demo proves the evaluation chain, not a paid model's performance.
+
+Real reviews, target labels, private run artifacts, prompts, and experiment results stay outside the repository. Any real model call or data transfer needs separate approval and a defined budget.
+
+## 5. Where to read more
+
+- [Development plan and evaluation boundaries](docs/DEVELOPMENT_PLAN.md)
+- [Dataset and licensing notes](docs/DATASETS.md)
+- [Chinese interview and decision notes](docs/INTERVIEW_NOTES.zh-CN.md)
+- [Package-level contract details](amazon_eval_agent/README.md)
+- [Project A: the generation side](https://github.com/simonshi-stu/llm-user-simulation-agent)
+
+If you only remember one thing: **the value of this project is not a prettier leaderboard; it is making a simulated-user agent's claims checkable, comparable, and honest about what it cannot prove.**
