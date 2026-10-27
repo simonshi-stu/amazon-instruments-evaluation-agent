@@ -1,0 +1,162 @@
+{
+  "cohort_group_binding": "direct",
+  "manifest_id": "batch1_synthetic",
+  "origin": {
+    "adapter": "synthetic_fixture.v1",
+    "kind": "synthetic_fixture",
+    "source_manifest_sha256": null,
+    "source_task_count": null
+  },
+  "protocol": {
+    "history_cut_date": "2020-01-01",
+    "history_visibility": "strictly_before_target_date",
+    "split_policy": {
+      "ties": "indivisible_group",
+      "train_ratio": 0.5,
+      "validation_ratio": 0.25
+    },
+    "target_region": "on_or_after_cut_date",
+    "timestamp_semantics": "synthetic_declared",
+    "user_holdout_policy": "allow_overlap_not_user_disjoint"
+  },
+  "schema_version": "task_manifest.v1",
+  "split_counts": {
+    "test": 3,
+    "train": 6,
+    "validation": 3
+  },
+  "tasks": [
+    {
+      "cohort_group": "ug_0000000000000001",
+      "execution_order": 0,
+      "history_max_date": "2020-01-02",
+      "manifest_context_sha256": "e3d4e6b70f4cdba1bdb8ec7891a43594a0b3b3117d133ff86b0c9c0c2cfe24ec",
+      "run_context_sha256": "6ec2bb4556831259f39a631c3bf1e06f34c614baa4c230d258b293725c8d6760",
+      "split": "train",
+      "target_date": "2020-02-01",
+      "target_timestamp_sha256": "28016f3a751a0fc1f69c428b2fe41a61c2b262d60d8350b7414ec70b97d10cc4",
+      "task_index": 0
+    },
+    {
+      "cohort_group": "ug_0000000000000001",
+      "execution_order": 1,
+      "history_max_date": "2020-01-03",
+      "manifest_context_sha256": "f2dcfdedd03fb4c4b51200d5df8afd4cfc9e97e9e75798c2381fb0154320aa6e",
+      "run_context_sha256": "8d85f7442e259626b183046530e33fc5005af1b998098b0386fa40c8d55ba2fe",
+      "split": "train",
+      "target_date": "2020-02-02",
+      "target_timestamp_sha256": "20c3e26a4bd70bbc4069b1d49faf4b0d298284c0c9e36d92cfb26a6b3cc4018d",
+      "task_index": 1
+    },
+    {
+      "cohort_group": "ug_0000000000000002",
+      "execution_order": 2,
+      "history_max_date": "2020-01-04",
+      "manifest_context_sha256": "e35e73bda450b567c39bfc27b741c3616d26ae6976946353e0f7068c6e7f6603",
+      "run_context_sha256": "367bc5ba3d12aefa734b6974a9c50783aacb608930f0ac8dba2e124a4b7ac327",
+      "split": "train",
+      "target_date": "2020-02-03",
+      "target_timestamp_sha256": "75611e56126bbeb13ad4ff0c0f057a9c4c28c1ddb9ebf0d8fa83c2484131d1a1",
+      "task_index": 2
+    },
+    {
+      "cohort_group": "ug_0000000000000002",
+      "execution_order": 3,
+      "history_max_date": "2020-01-05",
+      "manifest_context_sha256": "7e7c56a4e12274a4f5d3bc13622cf4902bd6db8bf85e79fb0c87c9d8699c5054",
+      "run_context_sha256": "5d7cefcadcb5a83a208c8ced0f4d1b54db829c614e41e93b7fa216ace6fdd72b",
+      "split": "train",
+      "target_date": "2020-02-04",
+      "target_timestamp_sha256": "b5a89c85ab44208ffc46710812ed4dd0b8f15d31df92ef6eab023d2df8bbdf19",
+      "task_index": 3
+    },
+    {
+      "cohort_group": "ug_0000000000000003",
+      "execution_order": 4,
+      "history_max_date": "2020-01-06",
+      "manifest_context_sha256": "ff0516060c1fa21bdd8518b4503919f2fc266a81f83794987b3d248929ea0a8f",
+      "run_context_sha256": "e76aaa3567edd1c635e3e94dc49dbde1c74843b223e87fcd3fe1ae2b0cacf669",
+      "split": "train",
+      "target_date": "2020-02-05",
+      "target_timestamp_sha256": "e481b6f722d2f1ea187dd2dbfb2f656744749759101e188c3b6a6493dbf3692b",
+      "task_index": 4
+    },
+    {
+      "cohort_group": "ug_0000000000000004",
+      "execution_order": 5,
+      "history_max_date": "2020-01-07",
+      "manifest_context_sha256": "0b8236a89570c0dc7c26afd7e53b85bc24e654602a6d18badf812dbf7ac9e0aa",
+      "run_context_sha256": "ddc1066f92cb6973635bcdcfee8b751b863f59d1063d2e2f7750575344ad1c93",
+      "split": "train",
+      "target_date": "2020-02-06",
+      "target_timestamp_sha256": "7fc9cccfa2ea7d35eb8d9a36c35cc15025b2dc2f7edcf186c058796312c3ff0c",
+      "task_index": 5
+    },
+    {
+      "cohort_group": "ug_0000000000000005",
+      "execution_order": 6,
+      "history_max_date": "2020-01-08",
+      "manifest_context_sha256": "cb2d75af965d72024422ade3c7a07d891a32f5dfeb79ccbdc25ac22b60666a46",
+      "run_context_sha256": "31e0bbef893583b676be527c260d03486090ca90137b17fde6dcfb8c9342bc41",
+      "split": "validation",
+      "target_date": "2020-02-07",
+      "target_timestamp_sha256": "b92fa7ca28cce72d1f1c82669d7c29066df5411fa8007df04245b80a0bbbaf11",
+      "task_index": 6
+    },
+    {
+      "cohort_group": "ug_0000000000000005",
+      "execution_order": 7,
+      "history_max_date": "2020-01-09",
+      "manifest_context_sha256": "ba1ede11ced4b7604c4f52e5475477ae389731894c8c25f98e78da10676831c6",
+      "run_context_sha256": "7a5e60d66240031878b59d6a539c9a12d6fd6020e53ec7ca599a39c109293af4",
+      "split": "validation",
+      "target_date": "2020-02-08",
+      "target_timestamp_sha256": "18938ca8952b43a092087555f41fa5ed7bd568945fe45181961850ec85745f87",
+      "task_index": 7
+    },
+    {
+      "cohort_group": "ug_0000000000000006",
+      "execution_order": 8,
+      "history_max_date": "2020-01-10",
+      "manifest_context_sha256": "82faf22f51f55e1678b534b2a2e7beffef65947f3f65d519acb6d6d1ce39fe84",
+      "run_context_sha256": "1334093c90d3ccf2b53621fb43e77be661a50c4592aa20c479cefdf4c6056197",
+      "split": "validation",
+      "target_date": "2020-02-09",
+      "target_timestamp_sha256": "5e69d95af63374017f4022a7fea6beb5e97fda8bd0c0850e9124c41c0dc94ea4",
+      "task_index": 8
+    },
+    {
+      "cohort_group": "ug_0000000000000007",
+      "execution_order": 9,
+      "history_max_date": "2020-01-11",
+      "manifest_context_sha256": "4072dc90ca92aa836273719d6e3a426ee29ce2d6f0f4113d815ac63e11ea929c",
+      "run_context_sha256": "056693f04d624841741d781142292644fb05a3f1ca359ee1345a4309372903ae",
+      "split": "test",
+      "target_date": "2020-02-10",
+      "target_timestamp_sha256": "6fa84c3d774bfde4096c4f94793ce464b8ac014c600fb3e49fe88b6f023333b8",
+      "task_index": 9
+    },
+    {
+      "cohort_group": "ug_0000000000000008",
+      "execution_order": 10,
+      "history_max_date": "2020-01-12",
+      "manifest_context_sha256": "6ab3fdcfb4a141774ba83c3f811175f6eca86d6a6ae05037a15e7e3b369526e5",
+      "run_context_sha256": "11cf93961a4248dc9d1e42772934a7f3b011f37677e0320b45bae4ef51bb1e88",
+      "split": "test",
+      "target_date": "2020-02-11",
+      "target_timestamp_sha256": "fd5b767b925a7fe364e2fba8c1217f14cdd59cf270531769ee21f1cb04ffbb22",
+      "task_index": 10
+    },
+    {
+      "cohort_group": "ug_0000000000000003",
+      "execution_order": 11,
+      "history_max_date": "2020-01-13",
+      "manifest_context_sha256": "5987a0ecd971840e43c0dd09f23a296ad2c149a9c49364c93b73f4c3becf7f0d",
+      "run_context_sha256": "14b3eebac701169b97666f1c34161110daadf8c2b897f30a2c6aa733225fa7cd",
+      "split": "test",
+      "target_date": "2020-02-12",
+      "target_timestamp_sha256": "c1fee82873c0ead26376913a9770bb10a90b2b372995fffb81f21a650d81b7b5",
+      "task_index": 11
+    }
+  ]
+}

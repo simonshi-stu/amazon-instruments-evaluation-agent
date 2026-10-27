@@ -1,0 +1,54 @@
+{
+  "label_set_id": "labels_batch1_synthetic",
+  "schema_version": "local_labels.v1",
+  "tasks": [
+    {
+      "stars": 3,
+      "task_index": 0
+    },
+    {
+      "stars": 4,
+      "task_index": 1
+    },
+    {
+      "stars": 5,
+      "task_index": 2
+    },
+    {
+      "stars": 2,
+      "task_index": 3
+    },
+    {
+      "stars": 4,
+      "task_index": 4
+    },
+    {
+      "stars": 3,
+      "task_index": 5
+    },
+    {
+      "stars": 4,
+      "task_index": 6
+    },
+    {
+      "stars": 3,
+      "task_index": 7
+    },
+    {
+      "stars": 5,
+      "task_index": 8
+    },
+    {
+      "stars": 4,
+      "task_index": 9
+    },
+    {
+      "stars": 3,
+      "task_index": 10
+    },
+    {
+      "stars": 5,
+      "task_index": 11
+    }
+  ]
+}

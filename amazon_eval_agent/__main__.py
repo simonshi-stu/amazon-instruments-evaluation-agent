@@ -1,4 +1,4 @@
-"""``python -m amazon_eval_agent validate ...`` entry point."""
+"""``python -m amazon_eval_agent`` entry point."""
 
 from .cli import main
 
