@@ -18,6 +18,10 @@ _site/
 *.pem
 *.key
 
+# Private interview material stays local; do not publish or link it.
+docs/INTERVIEW_NOTES*.md
+docs/INTERVIEW_GUIDE*.md
+
 # Private data and generated artifacts stay local.
 data/
 Dataset/

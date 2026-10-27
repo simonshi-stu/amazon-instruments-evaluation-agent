@@ -26,7 +26,7 @@
 
 所以这个项目把“生成”和“评测”分开：
 
-- **能算的交给工具算。** 评分误差、±1 星命中、覆盖率、格式失败、重试、回退、Prompt 实际纳入情况、耗时。
+- **能算的交给工具算。** 当前合同能算：评分误差、±1 星命中、覆盖率、四态、重试/回退、Prompt 字节与 Memory 计数。合同没有 latency/usage/首次格式 trace，报告写 `unknown_not_in_contract`，不推测。
 - **公平比较。** 两种方法必须在同一批任务、同一批用户上比较，不能各自挑自己做完的那部分。
 - **把分母摆出来。** 12 个任务里只成功 3 个的方案，不应该因为那 3 个简单任务误差低就显得更好。
 - **解释必须跟着证据走。** 后续可以让模型解释工具结果，但不能自己发明数字、引用或因果结论。
@@ -74,16 +74,20 @@ B 把数值、分母、覆盖率、限制整理成证据包
 - 严格的 `simulation_run.v1` 结果校验器和独立命令行入口。检查结构、资源上限、状态一致性、诊断不变量和敏感字段，同时不回显评论正文或文件路径。
 - GitHub Pages 在线合成 Demo：[打开演示](https://simonshi-stu.github.io/amazon-instruments-evaluation-agent/)。页面按“概要 → Visualization / 可视化 → 分析 → 总结”组织，总结会明确写真实模型准确率未测量以及后续改进。
 - 确定性的 Python 示例评分：MAE、RMSE、±1 星、偏差、覆盖率、共同任务比较；没有共同任务时拒绝比较。
-- 本轮验证：**100 项测试通过，3 项跳过**。跳过的是需要项目 A 新版契约镜像的跨仓检查，原件目前缺失。A 的公开 `main` 源码已恢复，但不能拿公开旧版冒充遗失的新版。
+- **第一批治理入口**：版本化评测配置、B 任务清单、独立来源哈希核验、A schema 2 清单/本地 prepared 导入、cohort/split/时间协议检查、A 运行结果接入、人工确认指纹。确认绑定配置/清单/标签/来源/运行结果，任一变化即失效。
+- **独立 prepared 验证**：B 从 A prepared 的 tasks/groundtruth/manifest/runtime_reviews 严格 join task/user/item/target 身份，重算 manifest context、可见历史/参考行选择、目标副本排除与 runtime context；A 运行记录存在的任务再核对运行 context。真实 prepared 的 400 任务上下文与恢复 A 3 任务运行 context 已核验。另用显式本地 fake 工具在 80 个真实 test 任务上贯通评分，但报告标记 fake，不是模型成绩。
+- **点估计评分入口**：`score` 只算 RMSE、MAE、±1 星和偏差；模型 success-only 与含 degraded 系统分别分母；失败/拒绝/缺失不按零误差填；全 cohort 覆盖与共同任务排除原因分列；不计算区间或显著性。**能评分真实结果文件，不等于已验证真实 LLM 成绩；fake/合成误差即使能算也不能当真实效果。** 纯本地工具实现不需要 LLM 授权。
+- 本轮验证：**240 项测试通过，3 项跳过**（本机设置了恢复 A 镜像/真实 prepared 环境变量；未设置时为 236 passed, 7 skipped）。3 项固定跳过仍是 sibling `llm-user-simulation-agent-dual` 为空的旧跨仓检查；恢复镜像测试未设置时 skip，不是伪造通过。
 
 **还没有完成**
 
-- 生产评测管线还没有接真实运行结果。现在的评分和比较在合成 Demo 里。
-- 模型解释层、结论与证据校验、不确定性区间、人工批准导出都还在后续阶段。
-- 本轮没有跑真实 LLM，没有人工风格评审，没有验证 Memory 收益，也没有新用户留出集成绩。
+- 没有真实 test-covering 的模型运行结果；恢复 A 的 3 任务 artifact 只含 train，预检正确 blocked，不能当作真实比较成果。
+- 真实 prepared 数据仍只有 `license_status=not_explicitly_verified`；本地只读审计可以核验哈希/协议，但公开或再分发被阻止。
+- 模型解释层、结论与证据校验、不确定性区间/显著性、人工批准导出仍在后续阶段。
+- 本轮没有跑真实 LLM，没有人工风格评审，没有验证 Memory 收益，也没有新用户留出集成绩。当前 400 任务协议允许同用户跨 split，不是 user-disjoint。
 - Demo 里的图证明的是评测逻辑，不是模型质量。页面会明确写这一点，不宣称真实准确率。
 
-一句话：**契约和透明的合成 Demo 已经能用；完整的评测诊断 Agent 还没完成。**
+一句话：**契约、第一批治理入口和合成/旧基线点估计已经能用；真实模型比较、区间、解释和批准导出还没完成。**
 
 ## 4. 怎么运行和部署？
 
@@ -102,9 +106,28 @@ B 把数值、分母、覆盖率、限制整理成证据包
 ```powershell
 python -m amazon_eval_agent validate --check
 python -m amazon_eval_agent validate --input "<结果文件绝对路径.json>" --json
+
+# 第一批：纯合成自检（不读外部文件、不调用模型）
+python -m amazon_eval_agent preflight --check
+
+# 真实/本地配置：每个逻辑资源都绑定本地文件；报告的路径/正文/用户 ID 不输出
+python -m amazon_eval_agent preflight --config "<config.json>" --bind "<id=path>" --output "results\preflight.json"
+python -m amazon_eval_agent confirm --config "<config.json>" --bind "<id=path>" `
+  --confirmed-at "2026-10-26T00:00:00Z" --output "results\confirmation.json"
+python -m amazon_eval_agent verify-confirmation --confirmation "results\confirmation.json" `
+  --config "<config.json>" --bind "<id=path>"
+python -m amazon_eval_agent score --config "<config.json>" --bind "<id=path>" `
+  --confirmation "results\confirmation.json" --output "results\score.json"
+
+# 从本地 A prepared 只读导入 B 清单 + 隔离标签（新文件，拒绝覆盖）
+python -m amazon_eval_agent import-a-prepared --prepared-dir "<prepared>" `
+  --manifest-output "results\manifest.json" --labels-output "results\labels.json" `
+  --manifest-id amazon_mi_2014_prepared_20261008
+python -m amazon_eval_agent verify-a-prepared --prepared-dir "<prepared>" `
+  --manifest "results\manifest.json" --labels "results\labels.json" --run "<A artifact.json>"
 ```
 
-退出码 `0` 表示结果文件**符合契约**，不代表预测准确。合法文件里仍可能有失败、拒绝或回退记录，报告会分别显示。
+退出码 `0` 表示结果文件**符合契约**或该步通过，不代表预测准确/真实模型已运行。合法文件里仍可能有失败、拒绝或回退记录，报告会分别显示。`score` 只输出点估计，没有区间/显著性；没有确认、没有 test 覆盖或来源哈希不一致都会非零拒绝。
 
 ### 在本地跑测试和 Demo
 
@@ -133,6 +156,8 @@ python -m http.server 8193 --bind 127.0.0.1 --directory _site
 ## 5. 继续阅读
 
 - [开发计划与评测边界](docs/DEVELOPMENT_PLAN.md)
+- [第一批协议：比较对象/清单/来源/时间/契约](docs/BATCH1_EVALUATION_PROTOCOL.md)
+- [公共架构与运行说明 v0.2.0](docs/ARCHITECTURE.md)
 - [数据集与许可核对](docs/DATASETS.md)
 - [包内契约细节](amazon_eval_agent/README.md)
 - [项目 A：生成侧](https://github.com/simonshi-stu/llm-user-simulation-agent)
@@ -169,7 +194,7 @@ Those are different failures, and a single accuracy number hides them.
 
 This project exists to make evaluation independent from generation:
 
-- **Measure what can be measured.** Rating error, ranking of misses, coverage, format failures, retries, fallbacks, prompt inclusion, and runtime cost.
+- **Measure what can be measured.** The current contract supports rating error, ±1-star hits, coverage, four states, retries/fallbacks, prompt bytes and memory counts. Latency, token usage and first-format traces are not in the contract; reports say `unknown_not_in_contract` rather than estimating them.
 - **Compare fairly.** Two methods are compared on the same tasks and the same users, not on whichever subset each method happened to finish.
 - **Show the denominator.** A model that succeeds on 3 easy tasks out of 12 should not look better than one that succeeds on 9 harder tasks.
 - **Keep explanations tied to evidence.** The long-term workflow lets a model explain tool results, but not invent numbers, citations, or causal claims.
@@ -217,16 +242,20 @@ The online demo tells this story with three small synthetic scenarios:
 - A strict `simulation_run.v1` artifact validator with a standalone CLI. It checks shape, resource limits, status consistency, diagnostic invariants, and privacy-sensitive fields without echoing review text or paths.
 - A public synthetic demo on GitHub Pages: [open the demo](https://simonshi-stu.github.io/amazon-instruments-evaluation-agent/). It is organised as Overview → Visualization → Analysis → Summary; the summary states that real-model accuracy is not measured and lists concrete next improvements.
 - Deterministic Python demo scoring for MAE, RMSE, ±1-star accuracy, bias, coverage, and common-task comparison. The demo also refuses to compare when there are no common tasks.
-- Verified in this round: **100 tests passed, 3 skipped**. The skipped cross-repository checks require the original newer Project A contract mirror, which is not present. The public Project A `main` source has been restored, but it is not a substitute for that missing mirror.
+- **Batch-1 governance**: versioned evaluation config, B-owned task manifest, independent local source hashing, A schema-2 manifest / prepared-directory adapters, cohort/split/time checks, A run ingestion, and manual confirmation bound to config/manifest/label/source/run fingerprints. Any bound change invalidates the confirmation.
+- **Independent prepared verification**: B strictly joins prepared tasks/groundtruth/manifest runtime rows on task/user/item/target identity, recomputes manifest context, visible-history/reference selections, target-copy exclusion and runtime context; A run records are checked where present. The real 400-task prepared contexts and the recovered A three-task run contexts were verified. A separate explicit local fake tool also completed an 80-test-task scoring smoke, clearly marked fake and not a model result.
+- **Point-scoring entry**: `score` computes RMSE, MAE, ±1-star and bias only; model success-only and system-with-degraded have separate denominators; failures/refusals/missing tasks are never zero-filled; full-cohort coverage and common-task exclusions are reported; no intervals or significance. **Scoring a real result file is not the same as a verified real-LLM result; fake or synthetic errors are pipeline evidence only.** The local pure-tool implementation needs no LLM authorization.
+- Verified in this round: **240 tests passed, 3 skipped** with the recovered-A environment variables set on this machine (236 passed, 7 skipped when they are absent). The three fixed skips are still the old cross-repository checks whose `llm-user-simulation-agent-dual` sibling is empty. The recovered A mirror is checked separately via environment variables and skips when absent; no mirror was fabricated.
 
 **Not finished yet**
 
-- The production metric pipeline has not been wired to real run artifacts. The current scoring and comparison live in the synthetic demo.
-- The explanation layer, claim-to-evidence validator, uncertainty intervals, and human-approved export are still later stages.
-- No real LLM experiment, human style review, memory effect measurement, or new-user holdout result has been produced in this round.
-- The demo's charts are evidence of the evaluation logic, not evidence of model quality. The page says this explicitly and makes no real-accuracy claim.
+- No real test-covering model run artifact. The recovered A three-task artifact covers only train, so the real preflight is correctly blocked and cannot support a real comparison.
+- The real prepared data still has `license_status=not_explicitly_verified`; local read-only auditing is possible, but publication/redistribution is blocked.
+- The explanation layer, claim-to-evidence validator, uncertainty intervals/significance, and human-approved export are still later stages.
+- No real LLM experiment, human style review, memory effect measurement, or new-user holdout result has been produced in this round. The current 400-task protocol allows the same user across splits; it is not user-disjoint.
+- The demo's charts are evidence of the evaluation logic, not evidence of model quality.
 
-The short version: **the contract and a transparent synthetic demo are working; the full evaluation-and-diagnosis agent is not finished.**
+The short version: **the contract, batch-1 governance, and synthetic/old-baseline point estimates work; real-model comparison, intervals, explanation, and approved export are not finished.**
 
 ## 4. Running and deploying it
 
@@ -245,9 +274,25 @@ Requires Python 3.10 or newer. The validator itself uses only the standard libra
 ```powershell
 python -m amazon_eval_agent validate --check
 python -m amazon_eval_agent validate --input "<path-to-run-artifact.json>" --json
+
+# Batch 1: standalone synthetic check (no external file, no model call)
+python -m amazon_eval_agent preflight --check
+
+python -m amazon_eval_agent preflight --config "<config.json>" --bind "<id=path>" `
+  --output "results\preflight.json"
+python -m amazon_eval_agent confirm --config "<config.json>" --bind "<id=path>" `
+  --confirmed-at "2026-10-26T00:00:00Z" --output "results\confirmation.json"
+python -m amazon_eval_agent score --config "<config.json>" --bind "<id=path>" `
+  --confirmation "results\confirmation.json" --output "results\score.json"
+
+python -m amazon_eval_agent import-a-prepared --prepared-dir "<prepared>" `
+  --manifest-output "results\manifest.json" --labels-output "results\labels.json" `
+  --manifest-id amazon_mi_2014_prepared_20261008
+python -m amazon_eval_agent verify-a-prepared --prepared-dir "<prepared>" `
+  --manifest "results\manifest.json" --labels "results\labels.json" --run "<A artifact.json>"
 ```
 
-Exit code `0` means the artifact is contract-valid. It does **not** mean the predictions are accurate. A valid artifact may still contain failed, refused, or degraded records, and the report shows those separately.
+Exit code `0` means the artifact is contract-valid or that step passed. It does **not** mean the predictions are accurate or that a real model ran. A valid artifact may still contain failed, refused, or degraded records, and the report shows those separately. `score` is point-estimate only; no confirmation, no holdout coverage, or a source-hash mismatch fails nonzero.
 
 ### Run the tests and the demo locally
 
@@ -276,6 +321,8 @@ Real reviews, target labels, private run artifacts, prompts, and experiment resu
 ## 5. Where to read more
 
 - [Development plan and evaluation boundaries](docs/DEVELOPMENT_PLAN.md)
+- [Batch-1 protocol: comparison, manifest, sources, time, contract](docs/BATCH1_EVALUATION_PROTOCOL.md)
+- [Public architecture and run notes v0.2.0](docs/ARCHITECTURE.md)
 - [Dataset and licensing notes](docs/DATASETS.md)
 - [Package-level contract details](amazon_eval_agent/README.md)
 - [Project A: the generation side](https://github.com/simonshi-stu/llm-user-simulation-agent)

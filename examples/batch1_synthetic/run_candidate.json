@@ -1,0 +1,347 @@
+{
+  "record_count": 12,
+  "records": [
+    {
+      "context_sha256": "6ec2bb4556831259f39a631c3bf1e06f34c614baa4c230d258b293725c8d6760",
+      "diagnostics": {
+        "llm_attempts": 1,
+        "memory": {
+          "candidates": 0,
+          "filtered_injection": 0,
+          "prompt_included": 0,
+          "selected": 0,
+          "time_eligible": 0,
+          "write": "written"
+        },
+        "prompt_bytes": 1000,
+        "repair": "not_requested"
+      },
+      "evidence_refs": [
+        "ev_0000000000000001"
+      ],
+      "execution_order": 0,
+      "prediction_origin": "llm",
+      "reason": "validated_model_output",
+      "review": "(synthetic batch1 sample) fabricated review for contract tests",
+      "split": "train",
+      "stars": 4,
+      "status": "success",
+      "task_index": 0,
+      "user_group": "ug_0000000000000001"
+    },
+    {
+      "context_sha256": "8d85f7442e259626b183046530e33fc5005af1b998098b0386fa40c8d55ba2fe",
+      "diagnostics": {
+        "llm_attempts": 1,
+        "memory": {
+          "candidates": 0,
+          "filtered_injection": 0,
+          "prompt_included": 0,
+          "selected": 0,
+          "time_eligible": 0,
+          "write": "written"
+        },
+        "prompt_bytes": 1001,
+        "repair": "not_requested"
+      },
+      "evidence_refs": [
+        "ev_0000000000000002"
+      ],
+      "execution_order": 1,
+      "prediction_origin": "llm",
+      "reason": "validated_model_output",
+      "review": "(synthetic batch1 sample) fabricated review for contract tests",
+      "split": "train",
+      "stars": 3,
+      "status": "success",
+      "task_index": 1,
+      "user_group": "ug_0000000000000001"
+    },
+    {
+      "context_sha256": "367bc5ba3d12aefa734b6974a9c50783aacb608930f0ac8dba2e124a4b7ac327",
+      "diagnostics": {
+        "llm_attempts": 1,
+        "memory": {
+          "candidates": 0,
+          "filtered_injection": 0,
+          "prompt_included": 0,
+          "selected": 0,
+          "time_eligible": 0,
+          "write": "written"
+        },
+        "prompt_bytes": 1002,
+        "repair": "not_requested"
+      },
+      "evidence_refs": [
+        "ev_0000000000000003"
+      ],
+      "execution_order": 2,
+      "prediction_origin": "llm",
+      "reason": "validated_model_output",
+      "review": "(synthetic batch1 sample) fabricated review for contract tests",
+      "split": "train",
+      "stars": 4,
+      "status": "success",
+      "task_index": 2,
+      "user_group": "ug_0000000000000002"
+    },
+    {
+      "context_sha256": "5d7cefcadcb5a83a208c8ced0f4d1b54db829c614e41e93b7fa216ace6fdd72b",
+      "diagnostics": {
+        "llm_attempts": 1,
+        "memory": {
+          "candidates": 0,
+          "filtered_injection": 0,
+          "prompt_included": 0,
+          "selected": 0,
+          "time_eligible": 0,
+          "write": "written"
+        },
+        "prompt_bytes": 1003,
+        "repair": "not_requested"
+      },
+      "evidence_refs": [
+        "ev_0000000000000004"
+      ],
+      "execution_order": 3,
+      "prediction_origin": "llm",
+      "reason": "validated_model_output",
+      "review": "(synthetic batch1 sample) fabricated review for contract tests",
+      "split": "train",
+      "stars": 2,
+      "status": "success",
+      "task_index": 3,
+      "user_group": "ug_0000000000000002"
+    },
+    {
+      "context_sha256": "e76aaa3567edd1c635e3e94dc49dbde1c74843b223e87fcd3fe1ae2b0cacf669",
+      "diagnostics": {
+        "llm_attempts": 1,
+        "memory": {
+          "candidates": 0,
+          "filtered_injection": 0,
+          "prompt_included": 0,
+          "selected": 0,
+          "time_eligible": 0,
+          "write": "written"
+        },
+        "prompt_bytes": 1004,
+        "repair": "not_requested"
+      },
+      "evidence_refs": [
+        "ev_0000000000000005"
+      ],
+      "execution_order": 4,
+      "prediction_origin": "llm",
+      "reason": "validated_model_output",
+      "review": "(synthetic batch1 sample) fabricated review for contract tests",
+      "split": "train",
+      "stars": 5,
+      "status": "success",
+      "task_index": 4,
+      "user_group": "ug_0000000000000003"
+    },
+    {
+      "context_sha256": "ddc1066f92cb6973635bcdcfee8b751b863f59d1063d2e2f7750575344ad1c93",
+      "diagnostics": {
+        "llm_attempts": 1,
+        "memory": {
+          "candidates": 0,
+          "filtered_injection": 0,
+          "prompt_included": 0,
+          "selected": 0,
+          "time_eligible": 0,
+          "write": "skipped"
+        },
+        "prompt_bytes": 900,
+        "repair": "not_requested"
+      },
+      "evidence_refs": [],
+      "execution_order": 5,
+      "prediction_origin": "none",
+      "reason": "llm_transport_error",
+      "review": null,
+      "split": "train",
+      "stars": null,
+      "status": "failed",
+      "task_index": 5,
+      "user_group": "ug_0000000000000004"
+    },
+    {
+      "context_sha256": "31e0bbef893583b676be527c260d03486090ca90137b17fde6dcfb8c9342bc41",
+      "diagnostics": {
+        "llm_attempts": 1,
+        "memory": {
+          "candidates": 0,
+          "filtered_injection": 0,
+          "prompt_included": 0,
+          "selected": 0,
+          "time_eligible": 0,
+          "write": "written"
+        },
+        "prompt_bytes": 1006,
+        "repair": "not_requested"
+      },
+      "evidence_refs": [
+        "ev_0000000000000007"
+      ],
+      "execution_order": 6,
+      "prediction_origin": "llm",
+      "reason": "validated_model_output",
+      "review": "(synthetic batch1 sample) fabricated review for contract tests",
+      "split": "validation",
+      "stars": 4,
+      "status": "success",
+      "task_index": 6,
+      "user_group": "ug_0000000000000005"
+    },
+    {
+      "context_sha256": "7a5e60d66240031878b59d6a539c9a12d6fd6020e53ec7ca599a39c109293af4",
+      "diagnostics": {
+        "llm_attempts": 1,
+        "memory": {
+          "candidates": 0,
+          "filtered_injection": 0,
+          "prompt_included": 0,
+          "selected": 0,
+          "time_eligible": 0,
+          "write": "skipped"
+        },
+        "prompt_bytes": 1100,
+        "repair": "reserve_failed"
+      },
+      "evidence_refs": [
+        "ev_0000000000000008"
+      ],
+      "execution_order": 7,
+      "prediction_origin": "statistical_baseline",
+      "reason": "statistical_baseline_fallback",
+      "review": null,
+      "split": "validation",
+      "stars": 4,
+      "status": "degraded",
+      "task_index": 7,
+      "user_group": "ug_0000000000000005"
+    },
+    {
+      "context_sha256": "1334093c90d3ccf2b53621fb43e77be661a50c4592aa20c479cefdf4c6056197",
+      "diagnostics": {
+        "llm_attempts": 0,
+        "memory": {
+          "candidates": 0,
+          "filtered_injection": 0,
+          "prompt_included": 0,
+          "selected": 0,
+          "time_eligible": 0,
+          "write": "not_attempted"
+        },
+        "prompt_bytes": 0,
+        "repair": "not_requested"
+      },
+      "evidence_refs": [],
+      "execution_order": 8,
+      "prediction_origin": "none",
+      "reason": "insufficient_evidence",
+      "review": null,
+      "split": "validation",
+      "stars": null,
+      "status": "refused",
+      "task_index": 8,
+      "user_group": "ug_0000000000000006"
+    },
+    {
+      "context_sha256": "056693f04d624841741d781142292644fb05a3f1ca359ee1345a4309372903ae",
+      "diagnostics": {
+        "llm_attempts": 1,
+        "memory": {
+          "candidates": 0,
+          "filtered_injection": 0,
+          "prompt_included": 0,
+          "selected": 0,
+          "time_eligible": 0,
+          "write": "written"
+        },
+        "prompt_bytes": 1009,
+        "repair": "not_requested"
+      },
+      "evidence_refs": [
+        "ev_000000000000000a"
+      ],
+      "execution_order": 9,
+      "prediction_origin": "llm",
+      "reason": "validated_model_output",
+      "review": "(synthetic batch1 sample) fabricated review for contract tests",
+      "split": "test",
+      "stars": 4,
+      "status": "success",
+      "task_index": 9,
+      "user_group": "ug_0000000000000007"
+    },
+    {
+      "context_sha256": "11cf93961a4248dc9d1e42772934a7f3b011f37677e0320b45bae4ef51bb1e88",
+      "diagnostics": {
+        "llm_attempts": 1,
+        "memory": {
+          "candidates": 0,
+          "filtered_injection": 0,
+          "prompt_included": 0,
+          "selected": 0,
+          "time_eligible": 0,
+          "write": "written"
+        },
+        "prompt_bytes": 1010,
+        "repair": "not_requested"
+      },
+      "evidence_refs": [
+        "ev_000000000000000b"
+      ],
+      "execution_order": 10,
+      "prediction_origin": "llm",
+      "reason": "validated_model_output",
+      "review": "(synthetic batch1 sample) fabricated review for contract tests",
+      "split": "test",
+      "stars": 3,
+      "status": "success",
+      "task_index": 10,
+      "user_group": "ug_0000000000000008"
+    },
+    {
+      "context_sha256": "14b3eebac701169b97666f1c34161110daadf8c2b897f30a2c6aa733225fa7cd",
+      "diagnostics": {
+        "llm_attempts": 2,
+        "memory": {
+          "candidates": 0,
+          "filtered_injection": 0,
+          "prompt_included": 0,
+          "selected": 0,
+          "time_eligible": 0,
+          "write": "skipped"
+        },
+        "prompt_bytes": 1100,
+        "repair": "attempted"
+      },
+      "evidence_refs": [
+        "ev_000000000000000c"
+      ],
+      "execution_order": 11,
+      "prediction_origin": "statistical_baseline",
+      "reason": "statistical_baseline_fallback",
+      "review": null,
+      "split": "test",
+      "stars": 4,
+      "status": "degraded",
+      "task_index": 11,
+      "user_group": "ug_0000000000000003"
+    }
+  ],
+  "schema_version": "simulation_run.v1",
+  "simulated": true,
+  "source": {
+    "config_fingerprint_sha256": "f9cefc4e20aca39708d253a1828fdb2988b25a361df2ee2c0f9ee13074ccdfe1",
+    "dataset_fingerprint_sha256": "b8c195f6badbf04f2d3f416df159cb51df5df17969a5e2ab58643fce711c875f",
+    "kind": "fake_on_synthetic",
+    "manifest_fingerprint_sha256": "a56914e571340bd64581a564b85d33d5c35e22222f9ee2455deb1aaf327b0bc9",
+    "model_source": "offline_injected_fake_callable",
+    "producer": "llm-user-simulation-agent"
+  }
+}

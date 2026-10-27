@@ -1,0 +1,104 @@
+{
+  "baseline": {
+    "kind": "a_p0_predictions_v1",
+    "mode": "global",
+    "resource_id": "baseline_predictions"
+  },
+  "cohort": {
+    "allow_user_overlap": true,
+    "development_splits": [
+      "train",
+      "validation"
+    ],
+    "holdout_splits": [
+      "test"
+    ],
+    "min_common_holdout_clusters": 2,
+    "min_common_holdout_tasks": 2
+  },
+  "condition": {
+    "condition_id": "candidate_fake",
+    "origin": "synthetic_fake_run",
+    "role": "candidate",
+    "run_resource_id": "run_candidate"
+  },
+  "config_id": "batch1_synthetic",
+  "confirmation": {
+    "required": true,
+    "scope": "preflight_only"
+  },
+  "labels": {
+    "resource_id": "labels",
+    "schema": "local_labels.v1"
+  },
+  "purpose": "synthetic_contract_check",
+  "resources": [
+    {
+      "contains_personal_data": false,
+      "expected_sha256": "b8c195f6badbf04f2d3f416df159cb51df5df17969a5e2ab58643fce711c875f",
+      "expected_size_bytes": 1034,
+      "kind": "dataset_normalized",
+      "license_status": "synthetic_fixture_only",
+      "redistribution_status": "synthetic_only",
+      "release": "synthetic_dataset_v1",
+      "resource_id": "dataset_normalized"
+    },
+    {
+      "contains_personal_data": false,
+      "expected_sha256": "a56914e571340bd64581a564b85d33d5c35e22222f9ee2455deb1aaf327b0bc9",
+      "expected_size_bytes": 6834,
+      "kind": "task_manifest",
+      "license_status": "synthetic_fixture_only",
+      "redistribution_status": "synthetic_only",
+      "release": "synthetic_manifest_v1",
+      "resource_id": "task_manifest"
+    },
+    {
+      "contains_personal_data": false,
+      "expected_sha256": "90237bb931b50fdd49ac9068cef6ba398d61285c7772dad2cfccc82ea6e045b7",
+      "expected_size_bytes": 742,
+      "kind": "local_labels",
+      "license_status": "synthetic_fixture_only",
+      "redistribution_status": "synthetic_only",
+      "release": "synthetic_labels_v1",
+      "resource_id": "labels"
+    },
+    {
+      "contains_personal_data": false,
+      "expected_sha256": "5b0122fac0251f81dfc90d600ae9ac1fe70015690730980f09f6593173932ce4",
+      "expected_size_bytes": 10168,
+      "kind": "run_artifact",
+      "license_status": "synthetic_fixture_only",
+      "redistribution_status": "synthetic_only",
+      "release": "synthetic_candidate_run_v1",
+      "resource_id": "run_candidate"
+    },
+    {
+      "contains_personal_data": false,
+      "expected_sha256": "73c58bd167f591d0a1db183d89d0f48e7b2eba0b7e71405291c0a1823803bdff",
+      "expected_size_bytes": 6032,
+      "kind": "baseline_predictions",
+      "license_status": "synthetic_fixture_only",
+      "redistribution_status": "synthetic_only",
+      "release": "synthetic_baseline_table_v1",
+      "resource_id": "baseline_predictions"
+    }
+  ],
+  "run_source_binding": {
+    "dataset_fingerprint_policy": "file_sha256",
+    "dataset_resource_id": "dataset_normalized",
+    "manifest_fingerprint_policy": "file_sha256",
+    "manifest_resource_id": "task_manifest"
+  },
+  "schema_version": "evaluation_config.v1",
+  "task_manifest": {
+    "adapter": "b_native_task_manifest.v1",
+    "resource_id": "task_manifest"
+  },
+  "temporal": {
+    "allow_declared_order_only_time": false,
+    "require_same_date_split_indivisible": true,
+    "require_targets_on_or_after_cut": true,
+    "require_verified_target_dates": true
+  }
+}

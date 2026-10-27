@@ -6,25 +6,29 @@
 
 用户确认按“找回源码 → 补齐评测 → 小规模真实 LLM → Prompt/检索优化 → Memory 对照 → 老用户未来行为与新用户独立泛化 → 必要时 Colab QLoRA”推进。AgentSociety＋Prompt＋LLM＋检索＋受控 Memory 是 A 生成侧路线，B 保持独立评测，不强制加入 LangChain 或向量库。
 
-为便于外行理解，提前交付合成可视化 Demo，但不跳过后续真实实验门槛。新增 Python 确定性示例评分、共同任务比较和 Pages 展示；真实模型、人评、用户级区间、Memory 与泛化收益尚未验证。A 公开 main 已恢复，原新版契约镜像仍缺失；三项跨仓测试明确跳过，不能伪称新版恢复。
+为便于外行理解，提前交付合成可视化 Demo，但不跳过后续真实实验门槛。新增 Python 确定性示例评分、共同任务比较和 Pages 展示；真实模型、人评、用户级区间、Memory 与泛化收益尚未验证。当日判断公开旧 checkout 不含原新版契约镜像；2026-10-26 已在本地恢复工作快照中核验镜像，但公开旧 checkout 仍不包含它，三项旧跨仓测试继续 skip，不能伪称从公开仓库恢复。
 
 本地开发记录不随仓库发布。每次方法、模型或 Prompt 变更填写选择理由、替代方案、实际对照、样本／分母、效果与局限；没有做过就不写成尝试过或已改善。
 
+## 2026-10-26 第一批与点估计增量
+
+A 恢复工作快照与本地 prepared 数据已用于只读兼容核验。B 现在有 typed/versioned 评测配置、B 拥有的任务清单、独立来源哈希核验、A schema 2 manifest 投影与 prepared 导入 adapter、cohort/split/时间协议检查、A `simulation_run.v1` 接入、人工确认指纹和点估计 `score` 入口。公开 fixture 仍全部合成；真实模型未运行，真实本地审计因候选 artifact 不覆盖 test 和许可未明确而 blocked。第一批与点估计测试为 **240 passed, 3 skipped**（本机设置恢复 A 环境变量；未设置时为 236 passed, 7 skipped）；3 个固定 skip 仍是 sibling `llm-user-simulation-agent-dual` 为空的旧跨仓测试，恢复镜像另用环境变量测试核验。
+
 ## 1. 当前水平与边界
 
-完整 B 工作流尚未实现。可复用的是 A 的数据审计/时间 provider/四统计基线；跨仓结果契约和独立验证入口已在本地独立验收（A 391 项、B 99 项测试），应用代码尚未发布。完整工具编排、比较、解释、结论校验和确认导出待做。
+B 的第一批治理入口和点估计评分已实现，但完整 B 工作流（区间、解释、结论校验、批准导出、真实实验）尚未完成。可复用的是 A 的数据审计/时间 provider/四统计基线；A 运行合同和 B 独立验证入口已在本仓库验收。真实 prepared 的四基线预测表可由 B 独立重算点指标，但这只是旧预测表的一致性审计，不是新实验。
 
-已有统计基线、fake 流程验证、真实 LLM 成绩必须分栏。固定顺序的工具工作流不是自主多 Agent。B 不生成用户评论，不裁定真实购买经历，也不把用户主观评分当商品质量真值。
+已有统计基线、fake 流程验证、真实 LLM 成绩必须分栏。固定顺序的工具工作流不是自主多 Agent。B 不生成用户评论，不裁定真实购买经历，也不把用户主观评分当商品质量真值。当前 400 任务协议允许同用户跨 split，不是 user-disjoint，不能据此声称新用户泛化。
 
 ## 2. 分步实现与验收
 
-### 第一步：结果契约已验收；评测目标配置待做
+### 第一步：结果契约、评测配置与来源/时间核验已验收；真实比较待授权
 
 - 目标：读取 A 输出，不依赖 A 应用入口；确认本次要比较谁、哪些任务及哪些指标。
-- 已实现：schema/version/source/manifest/config 指纹格式、严格大小/类型/四态和诊断不变量检查，dry-run 无模型调用无产物；B 用标准库可独立运行。
-- 已验收：fake 不被标成真实成绩；重复 task 身份/执行次序、非法 split 拒绝；无 GT/prompt/key/path 字段；错误非零安全类别；合成及已核验 prepared 前 3 任务的 fake A→B 互通通过。
-- 仍待做：typed 评测配置与人工确认、独立来源/manifest 重算、真实 cohort 和 split 对齐。现有指纹只是声明，不代表外部核验；正文也不自动脱敏。
-- 提示：先验证两条合成预测，不急着生成漂亮报告。配置确认不是数据许可确认。
+- 已实现：schema/version/source/manifest/config 指纹格式、严格大小/类型/四态和诊断不变量检查；`evaluation_config.v1` 闭集配置；`task_manifest.v1` 任务清单；A schema 2 manifest 投影与 prepared 导入（严格 task/GT/manifest 身份 join）；`b_prepared_context_v1` 独立重算 manifest/runtime context、可见历史/参考行、目标副本排除与运行 context；本地 source 字节大小/SHA-256 独立重算；cohort/split/时间/用户重叠检查；A run 任务/split/order/group/来源指纹 join；`evaluation_confirmation.v1` 人工确认指纹；`score` 点估计（RMSE/MAE/±1/bias、success-only 与 system 分母、全 cohort 覆盖、共同任务排除原因；内部重验确认）。
+- 已验收：fake 不被标成真实成绩；重复 task 身份/执行次序、非法 split、错源/错哈希、时间泄漏、篡改确认、stale/other-plan 确认、标签/预测映射不可变、隐私回显拒绝；合成 fixture 全链通过；真实 prepared 400 任务身份/上下文/历史/目标副本/标签核验通过，恢复 A 3 任务运行 context 3/3 通过；真实 artifact 3 train 仍因无 test 覆盖被正确 blocked；独立 fake 测试工具在 80 个真实 test 任务上贯通评分但不声称模型质量。
+- 仍待做：真实 test-covering 运行 artifact；真实模型调用与预算；许可确认；独立人工标签/评审；区间与显著性、LLM 解释、结论校验、批准导出。
+- 提示：先验证两条合成预测，不急着生成漂亮报告。配置确认不是数据许可确认；真实 prepared 的旧基线报告不是本轮新成绩。
 
 ### 第二步：注册可核验评测工具
 
@@ -41,6 +45,8 @@
 | `summarize_run` | 首次格式、修复三类计数、四态、attempt、耗时与 usage 状态 |
 
 工具从已确认配置获取权限，不允许模型任意查询用户、时间、路径或 SQL。真实数据/标签只在获准本地工具内读取。模型解释只接收脱敏汇总，不读取原始评论。
+
+2026-10-26 已实现其中一部分：`preflight` 覆盖来源哈希/schema/许可状态/时间协议/任务 join/cohort 覆盖；`score` 覆盖点估计、success-only 与 system 分母、共同任务排除原因。尚未实现独立工具编排、bootstrap 区间、评论诊断、LLM 解释与批准导出。
 
 验收先用手算、空样本、单 cluster、失败/回退、错 task join 反例；继承 P0 大小门槛和 provider 全量重建，不只检查文件名。
 
@@ -74,7 +80,7 @@
 
 ### 第五步：确认后导出与独立 Demo
 
-报告先为 draft。人工确认绑定 report/evidence/config 哈希；工具值或配置变化则使确认失效。只有 approved 版本正式导出；原文件拒覆盖。
+报告先为 draft。人工确认绑定 report/evidence/config 哈希；工具值或配置变化则使确认失效。只有 approved 版本正式导出；原文件拒覆盖。2026-10-26 实现了 **preflight 计划**的确认（绑定 config/manifest/labels/baseline/run/source 实际哈希，scope 明确为 `preflight_only_no_metrics`）；报告/证据确认与批准导出仍未实现。
 
 报告应包含数据协议、请求/有效/排除数量、指标、coverage、诊断、比较区间、限制和来源状态。默认不含评论、标签、原始用户 ID、prompt 或密钥。
 
